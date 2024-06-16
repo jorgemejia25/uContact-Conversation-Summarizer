@@ -3,10 +3,6 @@
 
 
 
-
-
-
-
 ### Resumen con URL en mensaje
 POST {{host}}/api/summarize
 Content-Type: {{contentType}}
@@ -15,6 +11,7 @@ Content-Type: {{contentType}}
   "message": "Ingresé a este enlace porque me interesaba la información presente: https://www.mytec.com.gt/?divice=c&gclid=EAIaIQobChMI8rPY3JXqjAMVlqZaBR0nMBtKEAAYASAAEgJzLfD_BwE&gad_source=1&gbraid=0AAAAADyeOYurq0VaJRoBmZTUpHYKDkr-b",
   "language": "es" 
 }
+
 
 
 
