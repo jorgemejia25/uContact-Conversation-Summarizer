@@ -1,0 +1,44 @@
+@host = http://localhost:3000
+@contentType = application/json
+
+### Resumen con URL en mensaje
+POST {{host}}/api/summarize
+Content-Type: {{contentType}}
+
+{
+  "message": "Puedes resumir esta página sobre inteligencia artificial: https://es.wikipedia.org/wiki/Inteligencia_artificial",
+  "language": "es" 
+}
+
+### Sin URL en el mensaje
+POST {{host}}/api/summarize
+Content-Type: {{contentType}}
+
+{
+  "message": "Este mensaje no contiene ninguna URL para analizar."
+}
+
+### URL inválida en el mensaje
+POST {{host}}/api/summarize
+Content-Type: {{contentType}}
+  
+{
+  "message": "Esta URL es inválida: esto_no_es_una_url"
+}
+
+### Sitio no existente en el mensaje
+POST {{host}}/api/summarize
+Content-Type: {{contentType}}
+
+{
+  "message": "Este sitio no existe: https://sitio-inexistente-12345.com"
+}
+
+### Mensaje con URL en inglés
+POST {{host}}/api/summarize
+Content-Type: {{contentType}}
+
+{
+  "message": "Can you summarize this article about artificial intelligence: https://en.wikipedia.org/wiki/Artificial_intelligence",
+  "language": "en"
+}
