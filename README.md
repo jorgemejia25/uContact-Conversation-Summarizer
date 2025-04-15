@@ -47,6 +47,7 @@ pnpm install
 cp .env.example .env
 # Edit .env with your OpenAI API key
 pnpm start
+```
 
 ## Descripción
 
