@@ -49,7 +49,7 @@ cp .env.example .env
 pnpm start
 ```
 
-## Descripción
+## Español
 
 El proyecto consta de un API que permite resumir el contenido de una página web a través de un mensaje que puede contener una URL. Esto funcionando con el uso de la API de OpenAI para generar resúmenes, permitiendo la integración con posibles Call Centers o Chatbots, para poder obtener el contenido de una página web y resumirlo de manera eficiente sin tener que ingresar manualmente el contenido de la página web.
 
