@@ -1,2 +1,6 @@
 .env
 node_modules
+
+# Ignore files directory contents but keep the directory
+files/*
+!files/.gitkeep

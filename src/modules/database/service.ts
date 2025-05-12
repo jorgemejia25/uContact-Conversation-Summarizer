@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 
 import { PoolRecord } from "../../types/pool_record";
 import { SummaryService } from "../summary/service";
@@ -15,9 +16,17 @@ interface CallRecord {
  * Service for handling database queries related to call records.
  */
 export class DatabaseService {
+  private readonly filesDir: string;
+
   constructor(
     private readonly summaryService: SummaryService = new SummaryService()
-  ) {}
+  ) {
+    // Ensure files directory exists
+    this.filesDir = path.join(process.cwd(), "files");
+    if (!fs.existsSync(this.filesDir)) {
+      fs.mkdirSync(this.filesDir, { recursive: true });
+    }
+  }
 
   /**
    * Get call records grouped by date for a specific source number
@@ -72,19 +81,18 @@ export class DatabaseService {
         .replace(/-/g, "");
 
       // full path of the file = /var/spool/asterisk/monitor/YYYYMMDD/guid.gsm
-      const file = `/var/spool/asterisk/monitor/${formattedDate}/${guid}.gsm`;
+      const sourceFile = `/var/spool/asterisk/monitor/${formattedDate}/${guid}.gsm`;
 
       // read the file
-      const fileContent = fs.readFileSync(file);
+      const fileContent = fs.readFileSync(sourceFile);
 
       // convert file to mp3
       const mp3 = await convertToMp3(fileContent);
 
       console.log("Mp3 creado");
 
-      // save the mp3 file in the /var/spool/asterisk/monitor/YYYYMMDD/guid.mp3
-      const mp3Path = `/var/spool/asterisk/monitor/${formattedDate}/${guid}.mp3`;
-
+      // save the mp3 file in the files directory
+      const mp3Path = path.join(this.filesDir, `${guid}.mp3`);
       fs.writeFileSync(mp3Path, mp3);
 
       console.log("Guardando mp3");
