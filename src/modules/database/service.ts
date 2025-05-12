@@ -94,13 +94,15 @@ export class DatabaseService {
 
       // save the mp3 file in the files directory
       const mp3Path = path.join(this.filesDir, `${guid}.mp3`);
+      console.log(mp3Path);
       fs.writeFileSync(mp3Path, mp3);
 
       console.log("Guardando mp3");
 
       try {
         // generate summary
-        const summary = await this.summaryService.summarizeAudio(mp3Path);
+        // const summary = await this.summaryService.summarizeAudio(mp3Path);
+        const summary = "Hola";
         console.log(summary);
         return { call: result[0], summary };
       } catch (error) {
