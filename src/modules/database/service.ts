@@ -106,14 +106,29 @@ export class DatabaseService {
         return { call: result[0], summary };
       } catch (error) {
         if (axios.isAxiosError(error)) {
+          // Log the complete error structure
           console.error("Error en la API de OpenAI:", {
             status: error.response?.status,
             statusText: error.response?.statusText,
-            data: JSON.stringify(error.response?.data, null, 2),
+            data: error.response?.data,
             message: error.message,
             code: error.code,
-            headers: JSON.stringify(error.response?.headers, null, 2),
+            headers: error.response?.headers,
+            request: {
+              method: error.config?.method,
+              url: error.config?.url,
+              headers: error.config?.headers,
+              data: error.config?.data,
+            },
           });
+
+          // Log the raw response data for debugging
+          if (error.response?.data) {
+            console.error(
+              "Respuesta de error completa:",
+              JSON.stringify(error.response.data, null, 2)
+            );
+          }
 
           // Si hay un mensaje de error específico de la API, lo usamos
           const errorMessage =
