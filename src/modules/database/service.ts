@@ -44,6 +44,7 @@ export class DatabaseService {
     FROM cdr_repo
     WHERE (src = ? OR dst = ?)
       AND disposition = 'ANSWERED'
+      AND duration > 15
     GROUP BY DATE(calldate)
     ORDER BY fecha ASC
     `;
