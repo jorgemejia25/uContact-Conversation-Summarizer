@@ -35,6 +35,8 @@ export async function convertToMp3(
     // Read the output MP3 file
     const mp3Buffer = fs.readFileSync(tempOutputFile);
 
+    console.log("Creando archivo mp3");
+
     // Clean up temporary files
     fs.unlinkSync(tempInputFile);
     fs.unlinkSync(tempOutputFile);

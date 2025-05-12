@@ -80,10 +80,14 @@ export class DatabaseService {
       // convert file to mp3
       const mp3 = await convertToMp3(fileContent);
 
+      console.log("Mp3 creado");
+
       // save the mp3 file in the /var/spool/asterisk/monitor/YYYYMMDD/guid.mp3
       const mp3Path = `/var/spool/asterisk/monitor/${formattedDate}/${guid}.mp3`;
 
       fs.writeFileSync(mp3Path, mp3);
+
+      console.log("Guardando mp3");
 
       // generate summary
       const summary = await this.summaryService.summarizeAudio(mp3Path);
