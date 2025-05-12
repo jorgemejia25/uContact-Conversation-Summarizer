@@ -101,8 +101,7 @@ export class DatabaseService {
 
       try {
         // generate summary
-        // const summary = await this.summaryService.summarizeAudio(mp3Path);
-        const summary = "Hola";
+        const summary = await this.summaryService.summarizeAudio(mp3Path);
         console.log(summary);
         return { call: result[0], summary };
       } catch (error) {
