@@ -108,9 +108,10 @@ export class DatabaseService {
           console.error("Error en la API de OpenAI:", {
             status: error.response?.status,
             statusText: error.response?.statusText,
-            data: error.response?.data,
+            data: JSON.stringify(error.response?.data, null, 2),
             message: error.message,
             code: error.code,
+            headers: JSON.stringify(error.response?.headers, null, 2),
           });
 
           // Si hay un mensaje de error específico de la API, lo usamos
