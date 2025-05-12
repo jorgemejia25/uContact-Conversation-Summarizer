@@ -91,7 +91,7 @@ Content-Type: application/json
 GET {{host}}/api/db/calls/45395109
 
 ### Get Call by Date and Time
-GET {{host}}/api/db/calls/guid?guid=0b89a92b-c38e-4a2f-880f-1b1ced9c8997
+GET {{host}}/api/db/calls/guid?guid=268f2bd9-f4cc-4df5-9de3-f8e2a20adf0e
 
 ### Get Call Transcription
 GET {{host}}/api/db/calls/audio?date=2024-10-25&time=14:19:08

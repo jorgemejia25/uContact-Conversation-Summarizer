@@ -36,13 +36,15 @@ export class DatabaseService {
    */
   public async getCallsByDateForSource(src: string): Promise<CallRecord[]> {
     // disposition is only answered
+    // src or dst
     const query = `
       SELECT
         DATE(calldate) AS fecha,
         GROUP_CONCAT(TIME(calldate) ORDER BY calldate SEPARATOR ', ') AS horas,
         GROUP_CONCAT(guid ORDER BY calldate SEPARATOR ', ') AS guids
       FROM cdr_repo
-      WHERE src = ? AND disposition = 'ANSWERED'
+      WHERE (src = ? OR dst = ?) AND disposition = 'ANSWERED'
+      AND duration > 10
       GROUP BY DATE(calldate)
       ORDER BY fecha ASC
     `;
