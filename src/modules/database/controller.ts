@@ -29,6 +29,7 @@ export class DatabaseController {
                   fecha: Type.String(),
                   horas: Type.String(),
                   guids: Type.String(),
+                  duraciones: Type.String(),
                 })
               ),
             },

@@ -11,6 +11,7 @@ interface CallRecord {
   fecha: string;
   horas: string;
   guids: string;
+  duraciones: string;
 }
 
 /**
@@ -40,7 +41,8 @@ export class DatabaseService {
     SELECT
       DATE(calldate) AS fecha,
       GROUP_CONCAT(TIME(calldate) ORDER BY calldate SEPARATOR ', ') AS horas,
-      GROUP_CONCAT(guid ORDER BY calldate SEPARATOR ', ') AS guids
+      GROUP_CONCAT(guid ORDER BY calldate SEPARATOR ', ') AS guids,
+      GROUP_CONCAT(duration ORDER BY calldate SEPARATOR ', ') AS duraciones 
     FROM cdr_repo
     WHERE (src = ? OR dst = ?)
       AND disposition = 'ANSWERED'
