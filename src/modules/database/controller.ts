@@ -47,25 +47,20 @@ export class DatabaseController {
 
       // use query params to get the call by date and time
       server.get(
-        "/calls/date-time",
+        "/calls/guid",
         {
           schema: {
             querystring: Type.Object({
-              date: Type.String(),
-              time: Type.String(),
+              guid: Type.String(),
             }),
           },
         },
         async (request, reply) => {
           try {
-            const { date, time } = request.query as {
-              date: string;
-              time: string;
+            const { guid } = request.query as {
+              guid: string;
             };
-            const callRecord = await this.databaseService.getCallByDateAndTime(
-              date,
-              time
-            );
+            const callRecord = await this.databaseService.getCallByGuid(guid);
             return callRecord;
           } catch (error) {
             server.log.error(error);
@@ -79,21 +74,16 @@ export class DatabaseController {
         {
           schema: {
             querystring: Type.Object({
-              date: Type.String(),
-              time: Type.String(),
+              guid: Type.String(),
             }),
           },
         },
         async (request, reply) => {
           try {
-            const { date, time } = request.query as {
-              date: string;
-              time: string;
+            const { guid } = request.query as {
+              guid: string;
             };
-            const callRecord = await this.databaseService.getCallByDateAndTime(
-              date,
-              time
-            );
+            const callRecord = await this.databaseService.getCallByGuid(guid);
 
             if (!callRecord) {
               return reply.code(404).send({ error: "Audio not found" });

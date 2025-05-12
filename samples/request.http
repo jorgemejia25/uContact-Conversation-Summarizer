@@ -1,4 +1,4 @@
-@host =  http://127.0.0.1:8000
+@host =  http://localhost:8000
 @contentType = application/json
 
 
@@ -88,13 +88,13 @@ Content-Type: application/json
 }
 
 ### Get Calls by Source
-GET http://localhost:8000/api/db/calls/23007500
+GET {{host}}/api/db/calls/59570122
 
 ### Get Call by Date and Time
-GET http://localhost:8000/api/db/calls/date-time?date=2025-02-05&time=10:24:00
+GET {{host}}/api/db/calls/date-time?date=2024-11-04&time=05:46:42
 
-### Get Call Audio
-GET http://localhost:8000/api/db/calls/audio?date=2025-02-05&time=10:24:00
+### Get Call Transcription
+GET {{host}}/api/db/calls/audio?date=2024-10-25&time=14:19:08
 
 ### Get Chat Summary
-GET http://localhost:8000/api/db/chat/summary?callerId=50231573100&date=2024-06-27
+GET {{host}}/api/db/chat/summary?callerId=50231573100&date=2024-06-27

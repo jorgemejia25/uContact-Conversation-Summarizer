@@ -8,6 +8,7 @@ import { executeQuery } from "./database";
 interface CallRecord {
   fecha: string;
   horas: string;
+  guids: string;
 }
 
 /**
@@ -21,14 +22,15 @@ export class DatabaseService {
   /**
    * Get call records grouped by date for a specific source number
    * @param src The source phone number
-   * @returns Array of call records with date and times
+   * @returns Array of call records with date, times and GUIDs
    */
   public async getCallsByDateForSource(src: string): Promise<CallRecord[]> {
     // disposition is only answered
     const query = `
       SELECT
         DATE(calldate) AS fecha,
-        GROUP_CONCAT(TIME(calldate) ORDER BY calldate SEPARATOR ', ') AS horas
+        GROUP_CONCAT(TIME(calldate) ORDER BY calldate SEPARATOR ', ') AS horas,
+        GROUP_CONCAT(guid ORDER BY calldate SEPARATOR ', ') AS guids
       FROM cdr_repo
       WHERE src = ? AND disposition = 'ANSWERED'
       GROUP BY DATE(calldate)
@@ -45,22 +47,17 @@ export class DatabaseService {
   }
 
   /**
-   * Get the call by date and time
-   * @param date The date of the call
-   * @param time The time of the call
-   * @returns The call record
+   * Get the call by GUID
+   * @param guid The GUID of the call
+   * @returns The call record with summary
    */
-  public async getCallByDateAndTime(
-    date: string,
-    time: string
-  ): Promise<{
+  public async getCallByGuid(guid: string): Promise<{
     call: PoolRecord;
     summary: string;
   } | null> {
-    // take only 1 record
-    const query = `SELECT * FROM cdr_repo WHERE DATE(calldate) = ? AND TIME(calldate) = ? AND disposition = 'ANSWERED' LIMIT 1`;
+    const query = `SELECT * FROM cdr_repo WHERE guid = ? AND disposition = 'ANSWERED' LIMIT 1`;
     try {
-      const result = await executeQuery<PoolRecord[]>(query, [date, time]);
+      const result = await executeQuery<PoolRecord[]>(query, [guid]);
 
       // if result is empty, return null
       if (result.length === 0) {
@@ -68,10 +65,14 @@ export class DatabaseService {
       }
 
       // format date to YYYYMMDD
-      const formattedDate = date.split("-").join("");
+      const callDate = new Date(result[0].calldate);
+      const formattedDate = callDate
+        .toISOString()
+        .split("T")[0]
+        .replace(/-/g, "");
 
       // full path of the file = /var/spool/asterisk/monitor/YYYYMMDD/guid.gsm
-      const file = `/var/spool/asterisk/monitor/${formattedDate}/${result[0].guid}.gsm`;
+      const file = `/var/spool/asterisk/monitor/${formattedDate}/${guid}.gsm`;
 
       // read the file
       const fileContent = fs.readFileSync(file);
@@ -80,7 +81,7 @@ export class DatabaseService {
       const mp3 = await convertToMp3(fileContent);
 
       // save the mp3 file in the /var/spool/asterisk/monitor/YYYYMMDD/guid.mp3
-      const mp3Path = `/var/spool/asterisk/monitor/${formattedDate}/${result[0].guid}.mp3`;
+      const mp3Path = `/var/spool/asterisk/monitor/${formattedDate}/${guid}.mp3`;
 
       fs.writeFileSync(mp3Path, mp3);
 
