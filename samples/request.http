@@ -1,14 +1,35 @@
-@host = http://localhost:3000
+@host =  http://127.0.0.1:8000
 @contentType = application/json
+
+
+
+
+
+
 
 ### Resumen con URL en mensaje
 POST {{host}}/api/summarize
 Content-Type: {{contentType}}
 
 {
-  "message": "Puedes resumir esta página sobre inteligencia artificial: https://es.wikipedia.org/wiki/Inteligencia_artificial",
+  "message": "Ingresé a este enlace porque me interesaba la información presente: https://www.mytec.com.gt/?divice=c&gclid=EAIaIQobChMI8rPY3JXqjAMVlqZaBR0nMBtKEAAYASAAEgJzLfD_BwE&gad_source=1&gbraid=0AAAAADyeOYurq0VaJRoBmZTUpHYKDkr-b",
   "language": "es" 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Sin URL en el mensaje
 POST {{host}}/api/summarize
@@ -42,3 +63,38 @@ Content-Type: {{contentType}}
   "message": "Can you summarize this article about artificial intelligence: https://en.wikipedia.org/wiki/Artificial_intelligence",
   "language": "en"
 }
+
+### Resumen con URL en mensaje y respuesta en inglés en Respond.io
+POST {{host}}/api/summarize/respond
+Content-Type: {{contentType}}
+
+{"event_type":"message.received","event_id":"6174e5a2-3981-412e-85fd-427d003b2e89","contact":{"id":245523755,"firstName":"Jorge","lastName":"Mejía","phone":"+50231573100","email":null,"language":null,"profilePic":null,"countryCode":"GT","status":"open","assignee":{"id":null,"firstName":null,"lastName":null,"email":null},"created_at":1736625777,"lifecycle":""},"message":{"messageId":1744776374000000,"channelMessageId":"wamid.HBgLNTAyMzE1NzMxMDAVAgASGBYzRUIwNzE0QzVBRDQzNkZGMDIzRkVBAA==","contactId":245523755,"channelId":145315,"traffic":"incoming","timestamp":1744776374000,"message":{"type":"text","text":"Probando"}},"channel":{"id":145315,"name":"WhatsApp Cloud API (01)","source":"whatsapp_cloud","meta":"{\"meta\":{\"profile\":{\"name\":\"Jorge Mejía\"},\"wa_id\":\"50231573100\",\"firstName\":\"Jorge\",\"lastName\":\"Mejía\"}}","created_at":1685808128}}
+
+### Summarize URL
+POST http://localhost:8000/api/summarize
+Content-Type: application/json
+
+{
+  "message": "https://www.nytimes.com/2022/10/04/technology/twitter-elon-musk.html",
+  "language": "es"
+}
+
+### Audio Summarization
+POST http://localhost:8000/api/summarize/audio
+Content-Type: application/json
+
+{
+  "audioFilePath": "/home/jorgis/Documents/IA/calls/test.mp3"
+}
+
+### Get Calls by Source
+GET http://localhost:8000/api/db/calls/23007500
+
+### Get Call by Date and Time
+GET http://localhost:8000/api/db/calls/date-time?date=2025-02-05&time=10:24:00
+
+### Get Call Audio
+GET http://localhost:8000/api/db/calls/audio?date=2025-02-05&time=10:24:00
+
+### Get Chat Summary
+GET http://localhost:8000/api/db/chat/summary?callerId=50231573100&date=2024-06-27

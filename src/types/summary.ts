@@ -12,14 +12,18 @@ export interface SummaryRequest {
  * Schema for validating a summary request.
  */
 export const SummaryRequestSchema = Type.Object({
-  message: Type.String({ 
+  message: Type.String({
     minLength: 1,
-    description: 'Message that may contain a URL to analyze'
+    description: "Message that may contain a URL to analyze",
   }),
   language: Type.Optional(
-    Type.Enum({ es: 'es', en: 'en', pt: 'pt' }, { 
-      default: 'es',
-      description: 'Language for the summary: es (Spanish), en (English), or pt (Portuguese)' 
-    })
+    Type.Enum(
+      { es: "es", en: "en", pt: "pt" },
+      {
+        default: "es",
+        description:
+          "Language for the summary: es (Spanish), en (English), or pt (Portuguese)",
+      }
+    )
   ),
 });

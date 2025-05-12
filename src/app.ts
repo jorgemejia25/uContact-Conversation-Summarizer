@@ -1,5 +1,6 @@
 import fastify, { FastifyInstance } from "fastify";
 
+import { DatabaseController } from "./modules/database/controller";
 import { SummaryController } from "./modules/summary/controller";
 
 /**
@@ -39,7 +40,11 @@ export class AppServer {
    */
   private registerRoutes() {
     const summaryController = new SummaryController();
-    this.app.register(summaryController.routes, { prefix: "/api" });
+    this.app.register(summaryController.routes, { prefix: "/api/summarize" });
+
+    // Register database routes
+    const databaseController = new DatabaseController();
+    this.app.register(databaseController.routes, { prefix: "/api/db" });
   }
 
   /**
