@@ -3,6 +3,7 @@ import * as path from "path";
 
 import { PoolRecord } from "../../types/pool_record";
 import { SummaryService } from "../summary/service";
+import axios from "axios";
 import { convertToMp3 } from "../../utils/audio";
 import { executeQuery } from "./database";
 
@@ -97,12 +98,28 @@ export class DatabaseService {
 
       console.log("Guardando mp3");
 
-      // generate summary
-      const summary = await this.summaryService.summarizeAudio(mp3Path);
+      try {
+        // generate summary
+        const summary = await this.summaryService.summarizeAudio(mp3Path);
+        console.log(summary);
+        return { call: result[0], summary };
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("Error en la API de OpenAI:", {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message,
+            code: error.code,
+          });
 
-      console.log(summary);
-
-      return { call: result[0], summary };
+          // Si hay un mensaje de error específico de la API, lo usamos
+          const errorMessage =
+            error.response?.data?.error?.message || error.message;
+          throw new Error(`Error al procesar el audio: ${errorMessage}`);
+        }
+        throw error;
+      }
     } catch (error) {
       console.error("Error retrieving call record:", error);
       throw error;
