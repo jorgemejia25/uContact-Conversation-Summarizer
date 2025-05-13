@@ -177,4 +177,34 @@ export class DatabaseService {
 
     return summary;
   }
+
+  /**
+   * Get all dates when a phone number has sent messages
+   * @param callerId The phone number to search for
+   * @returns Array of dates with message counts
+   */
+  public async getChatDates(
+    callerId: string
+  ): Promise<{ fecha: string; mensajes: number }[]> {
+    const query = `
+      SELECT 
+        DATE(dateprocessed) as fecha,
+        COUNT(*) as mensajes
+      FROM sms_repo
+      WHERE callerid = ?
+      GROUP BY DATE(dateprocessed)
+      ORDER BY fecha DESC;
+    `;
+
+    try {
+      const result = await executeQuery<{ fecha: string; mensajes: number }[]>(
+        query,
+        [callerId]
+      );
+      return result;
+    } catch (error) {
+      console.error("Error retrieving chat dates:", error);
+      throw error;
+    }
+  }
 }

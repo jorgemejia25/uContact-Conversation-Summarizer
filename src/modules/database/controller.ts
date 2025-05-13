@@ -129,6 +129,41 @@ export class DatabaseController {
           }
         }
       );
+
+      // Get chat dates for a phone number
+      server.get(
+        "/chat/dates",
+        {
+          schema: {
+            querystring: Type.Object({
+              callerId: Type.String(),
+            }),
+            response: {
+              200: Type.Array(
+                Type.Object({
+                  fecha: Type.String(),
+                  mensajes: Type.Number(),
+                })
+              ),
+              500: Type.Object({
+                error: Type.String(),
+              }),
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const { callerId } = request.query as { callerId: string };
+            const dates = await this.databaseService.getChatDates(callerId);
+            return dates;
+          } catch (error) {
+            server.log.error(error);
+            return reply
+              .code(500)
+              .send({ error: "Error retrieving chat dates" });
+          }
+        }
+      );
     };
   }
 }

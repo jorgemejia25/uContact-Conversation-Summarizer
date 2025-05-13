@@ -90,11 +90,11 @@ Content-Type: application/json
 ### Get Calls by Source
 GET {{host}}/api/db/calls/23296274
 
-### Get Call by Date and Time
-GET {{host}}/api/db/calls/guid?guid=769a1582-ef75-460e-ad53-7c455500ad0d
+### Transcription by Guid
+GET {{host}}/api/db/calls/guid?guid=94c9e251-5e14-4946-a6d6-ccfd8b00ce73
 
-### Get Call Transcription
-GET {{host}}/api/db/calls/audio?date=2024-10-25&time=14:19:08
+### Get Chat Dates
+GET {{host}}/api/db/chat/dates?callerId=50231573100
 
 ### Get Chat Summary
 GET {{host}}/api/db/chat/summary?callerId=50231573100&date=2024-06-27
