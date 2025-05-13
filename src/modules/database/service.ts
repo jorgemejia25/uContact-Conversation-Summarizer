@@ -170,6 +170,10 @@ export class DatabaseService {
       }[]
     >(query);
 
+    if (result.length === 0) {
+      return "No hay mensajes para este día";
+    }
+
     // generate summary
     const summary = await this.summaryService.generateSummary(
       result.map((item) => item.message).join("\n")
