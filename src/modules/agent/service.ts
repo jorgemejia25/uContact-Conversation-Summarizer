@@ -83,23 +83,38 @@ export class AgentService {
           // Format the date properly for SQL query
           let formattedDate = dateRecord.fecha;
 
+          console.log(
+            `Original date: "${
+              dateRecord.fecha
+            }", type: ${typeof dateRecord.fecha}, length: ${
+              dateRecord.fecha?.length
+            }`
+          );
+
           // Convert fecha to proper SQL date format (YYYY-MM-DD)
           if (typeof dateRecord.fecha === "string") {
-            // If it's a full date string with timezone info, parse and format it
-            if (
-              dateRecord.fecha.includes("GMT") ||
-              dateRecord.fecha.includes("T") ||
-              dateRecord.fecha.length > 10
-            ) {
-              const date = new Date(dateRecord.fecha);
-              if (!isNaN(date.getTime())) {
-                formattedDate = date.toISOString().split("T")[0];
+            // Always try to parse the date and convert to YYYY-MM-DD format
+            const date = new Date(dateRecord.fecha);
+            console.log(
+              `Parsed date: ${date}, isValid: ${!isNaN(date.getTime())}`
+            );
+
+            if (!isNaN(date.getTime())) {
+              formattedDate = date.toISOString().split("T")[0];
+              console.log(`Converted to: ${formattedDate}`);
+            } else {
+              console.error(`Failed to parse date: ${dateRecord.fecha}`);
+              // If parsing fails, try to extract just the date part if it's already in YYYY-MM-DD format
+              const dateMatch = dateRecord.fecha.match(/\d{4}-\d{2}-\d{2}/);
+              if (dateMatch) {
+                formattedDate = dateMatch[0];
+                console.log(`Extracted date part: ${formattedDate}`);
               }
             }
           }
 
           console.log(
-            `Processing date: ${dateRecord.fecha} -> ${formattedDate}`
+            `Final processed date: ${dateRecord.fecha} -> ${formattedDate}`
           );
 
           const summary = await this.databaseService.getChatSummary(

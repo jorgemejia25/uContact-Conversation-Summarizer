@@ -105,7 +105,7 @@ Content-Type: {{contentType}}
 
 {
   "number": "50231573100",
-  "message": "Hola, ¿cómo estás?",
+  "message": "Revisa mis conversaciones anteriores. Qué te dije?",
   "language": "es"
 }
 
@@ -115,7 +115,7 @@ Content-Type: {{contentType}}
 
 {
   "number": "50231573100",
-  "message": "¿Podrías ayudarme con información sobre este producto?",
+  "message": "Por favor",
   "contextUrl": "https://www.mytec.com.gt/",
   "language": "es"
 }

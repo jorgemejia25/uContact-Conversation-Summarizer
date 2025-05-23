@@ -158,8 +158,8 @@ export class DatabaseService {
     const query = `
       SELECT callerid, message, dateprocessed
       FROM sms_repo
-      WHERE DATE(dateprocessed) = '${date}'
-        AND callerid = '${callerId}';
+      WHERE DATE(dateprocessed) = ?
+        AND callerid = ?;
     `;
 
     const result = await executeQuery<
@@ -168,7 +168,7 @@ export class DatabaseService {
         message: string;
         dateprocessed: string;
       }[]
-    >(query);
+    >(query, [date, callerId]);
 
     if (result.length === 0) {
       return "No hay mensajes para este día";
