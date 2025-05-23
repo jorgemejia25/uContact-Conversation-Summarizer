@@ -127,7 +127,7 @@ export class SummaryService {
     try {
       console.log("Downloading PDF from:", url);
 
-      // Download the PDF
+      // Download the PDF with conservative limits
       const response = await axios.get(url, {
         responseType: "arraybuffer",
         headers: {
@@ -135,8 +135,9 @@ export class SummaryService {
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
           Accept: "application/pdf,*/*",
         },
-        timeout: 30000, // 30 seconds timeout for PDF downloads
-        maxContentLength: 50 * 1024 * 1024, // 50MB max file size
+        timeout: 15000, // Reduced to 15 seconds timeout
+        maxContentLength: 10 * 1024 * 1024, // Reduced to 10MB max file size
+        maxRedirects: 3, // Limit redirects
       });
 
       // Verify content type
@@ -147,13 +148,16 @@ export class SummaryService {
         );
       }
 
-      console.log(`PDF downloaded, size: ${response.data.byteLength} bytes`);
+      const fileSizeMB = (response.data.byteLength / (1024 * 1024)).toFixed(2);
+      console.log(`PDF downloaded successfully, size: ${fileSizeMB}MB`);
 
       // Extract text from PDF
       const data = await pdfParse(response.data);
 
       if (!data.text || data.text.trim().length === 0) {
-        throw new Error("No text could be extracted from the PDF");
+        throw new Error(
+          "No text could be extracted from the PDF - file may be image-based or corrupted"
+        );
       }
 
       console.log(
@@ -169,21 +173,23 @@ export class SummaryService {
       const cleanedText = data.text
         .replace(/\s+/g, " ") // Replace multiple whitespace with single space
         .trim()
-        .substring(0, 5000); // Limit to 5000 characters for PDFs (more than web pages)
+        .substring(0, 4000); // Reduced to 4000 characters for better performance
 
       return cleanedText;
     } catch (error) {
       console.error("Error processing PDF:", error);
 
       if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
+        if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") {
           throw new Error(
-            "PDF download timeout - file too large or server too slow"
+            "PDF download timeout - file too large or server too slow. Try a smaller PDF file."
           );
         } else if (error.response?.status === 404) {
           throw new Error("PDF file not found (404)");
         } else if (error.response?.status === 403) {
           throw new Error("Access denied to PDF file (403)");
+        } else if (error.response?.status === 413) {
+          throw new Error("PDF file too large for server to handle");
         }
       }
 

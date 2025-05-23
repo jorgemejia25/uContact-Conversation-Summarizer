@@ -38,7 +38,16 @@ export class AgentService {
           console.log("PDF context successfully extracted");
         } catch (error) {
           console.error("Error getting PDF context:", error);
-          // Continue without PDF context if it fails
+          // Add a note about PDF processing failure to the context
+          const pdfErrorMessages = {
+            es: "Nota: No se pudo procesar el documento PDF proporcionado debido a un error técnico (archivo muy grande, timeout, o formato no compatible). Responderé basándome en tu historial de conversaciones.",
+            en: "Note: Could not process the provided PDF document due to a technical error (file too large, timeout, or incompatible format). I'll respond based on your conversation history.",
+            pt: "Nota: Não foi possível processar o documento PDF fornecido devido a um erro técnico (arquivo muito grande, timeout ou formato incompatível). Responderei com base no seu histórico de conversas.",
+          };
+
+          const language = request.language || "es";
+          contextContent =
+            pdfErrorMessages[language as keyof typeof pdfErrorMessages];
         }
       }
 
