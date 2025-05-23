@@ -85,6 +85,15 @@ export class SummaryService {
   }
 
   /**
+   * Public method to scrape content from a URL for external services.
+   * @param url The URL to scrape content from.
+   * @returns A promise that resolves to the scraped content.
+   */
+  public async getScrapeContent(url: string): Promise<string> {
+    return this.scrapeContent(url);
+  }
+
+  /**
    * Scrapes content from the given URL using multiple methods (Axios and Puppeteer).
    * @param url The URL of the web page to scrape.
    * @returns A promise that resolves to the scraped content as a string.

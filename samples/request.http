@@ -98,3 +98,45 @@ GET {{host}}/api/db/chat/dates?callerId=50231573100
 
 ### Get Chat Summary
 GET {{host}}/api/db/chat/summary?callerId=50231573100&date=2025-04-14
+
+### Agent Chat - Simple message
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Hola, ¿cómo estás?",
+  "language": "es"
+}
+
+### Agent Chat - With context URL
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "¿Podrías ayudarme con información sobre este producto?",
+  "contextUrl": "https://www.mytec.com.gt/",
+  "language": "es"
+}
+
+### Agent Chat - English
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Can you help me understand this topic better?",
+  "contextUrl": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+  "language": "en"
+}
+
+### Agent Chat - Local development
+POST http://localhost:8000/api/agent/chat
+Content-Type: application/json
+
+{
+  "number": "50231573100",
+  "message": "¿Qué puedes decirme sobre mi historial de llamadas?",
+  "language": "es"
+}

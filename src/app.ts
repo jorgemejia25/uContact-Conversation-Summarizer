@@ -1,5 +1,6 @@
 import fastify, { FastifyInstance } from "fastify";
 
+import { AgentController } from "./modules/agent/controller";
 import { DatabaseController } from "./modules/database/controller";
 import { SummaryController } from "./modules/summary/controller";
 
@@ -45,6 +46,10 @@ export class AppServer {
     // Register database routes
     const databaseController = new DatabaseController();
     this.app.register(databaseController.routes, { prefix: "/api/db" });
+
+    // Register agent routes
+    const agentController = new AgentController();
+    this.app.register(agentController.routes, { prefix: "/api" });
   }
 
   /**
