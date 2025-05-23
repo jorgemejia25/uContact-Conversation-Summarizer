@@ -27,14 +27,14 @@ export const AgentRequestSchema = Type.Object({
   }),
   contextUrl: Type.Optional(
     Type.String({
-      format: "uri",
+      minLength: 1,
       description:
         "Optional URL to provide context for the response (web pages)",
     })
   ),
   pdfUrl: Type.Optional(
     Type.String({
-      format: "uri",
+      minLength: 1,
       description: "Optional PDF URL to provide context for the response",
     })
   ),

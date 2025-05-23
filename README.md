@@ -189,8 +189,94 @@ El agente utiliza las últimas 3 conversaciones del usuario para personalizar su
 
 ### Capacidades con PDF:
 - ✅ **Detección automática** de URLs que apuntan a archivos PDF
-- ✅ **Descarga segura** con límites de tamaño (50MB máximo)
+- ✅ **Descarga segura** con límites de tamaño (10MB máximo)
+- ✅ **Sistema de caché inteligente** - Evita descargas repetidas
 - ✅ **Extracción de texto** completa del contenido del PDF
 - ✅ **Procesamiento inteligente** con límite de caracteres optimizado para IA
 - ✅ **Manejo de errores** robusto para PDFs corruptos o inaccesibles
+- ⚡ **Timeout optimizado** (15 segundos) para mejor rendimiento
 
+### 🚀 Sistema de Caché de PDF:
+
+**Características del Caché:**
+- 🗄️ **Almacenamiento en memoria** de PDFs procesados
+- ⏱️ **Expiración automática** después de 24 horas
+- 📊 **Límites inteligentes:** 50 PDFs o 100MB máximo
+- 🔄 **LRU (Least Recently Used)** para gestión automática de espacio
+- 📈 **Estadísticas detalladas** de hit/miss ratio
+
+**Endpoints de Gestión de Caché:**
+
+#### Obtener estadísticas del caché
+**GET** `/api/summarize/cache/stats`
+```json
+{
+  "message": "PDF Cache statistics",
+  "stats": {
+    "totalEntries": 5,
+    "totalSizeInBytes": 2048576,
+    "cacheHits": 12,
+    "cacheMisses": 8,
+    "hitRate": 60.0,
+    "lastCleanup": 1647890123456
+  }
+}
+```
+
+#### Listar URLs cacheadas
+**GET** `/api/summarize/cache/list`
+```json
+{
+  "message": "Cached PDF URLs",
+  "count": 3,
+  "urls": [
+    {
+      "url": "https://example.com/doc.pdf",
+      "pages": 25,
+      "title": "Sample Document",
+      "timestamp": 1647890123456,
+      "sizeInMB": 1.5
+    }
+  ]
+}
+```
+
+#### Limpiar todo el caché
+**DELETE** `/api/summarize/cache/clear`
+
+#### Remover URL específica del caché
+**DELETE** `/api/summarize/cache/remove`
+```json
+{
+  "url": "https://example.com/document.pdf"
+}
+```
+
+### ⚠️ Limitaciones y Mejores Prácticas para PDF:
+
+**Limitaciones:**
+- 📏 **Tamaño máximo:** 10MB por archivo
+- ⏱️ **Timeout:** 15 segundos de descarga
+- 📄 **Texto únicamente:** PDFs basados en imágenes no son procesables
+- 🔒 **Acceso público:** Solo PDFs accesibles públicamente
+
+**Mejores Prácticas:**
+- ✅ Usa PDFs pequeños (< 5MB) para mejor rendimiento
+- ✅ Verifica que el PDF contenga texto seleccionable
+- ✅ Usa URLs directas a archivos PDF
+- ✅ El agente continuará funcionando aunque falle el PDF
+- ⚡ **URLs frecuentes se cargan instantáneamente desde caché**
+- 📊 **Monitorea estadísticas de caché** para optimizar uso
+
+**Beneficios del Caché:**
+- 🚀 **Respuesta instantánea** para PDFs previamente procesados
+- 💾 **Ahorro de ancho de banda** - no re-descarga archivos
+- ⚡ **Mejor experiencia de usuario** - sin esperas repetidas
+- 📈 **Escalabilidad mejorada** - menos carga en el servidor
+
+**URLs de PDF recomendadas para pruebas:**
+```
+https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+https://www.clickdimensions.com/links/TestPDFfile.pdf
+https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf
+```

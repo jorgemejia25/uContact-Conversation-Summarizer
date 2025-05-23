@@ -6,7 +6,9 @@ import { SummaryRequest } from "../../types/summary";
 import { WebhookRequest } from "../../types/respond_webhook";
 import axios from "axios";
 import { injectable } from "tsyringe";
+import { pdfCache } from "../../utils/pdf-cache";
 import puppeteer from "puppeteer";
+import { normalizeUrl, isValidUrl } from "../../utils/url-encoder";
 
 // Import pdf-parse correctly
 const pdfParse = require("pdf-parse");
@@ -125,10 +127,24 @@ export class SummaryService {
    */
   public async processPdfFromUrl(url: string): Promise<string> {
     try {
-      console.log("Downloading PDF from:", url);
+      // Normalize the URL first
+      const normalizedUrl = normalizeUrl(url);
+
+      // Validate URL
+      if (!isValidUrl(normalizedUrl)) {
+        throw new Error("Invalid URL format");
+      }
+
+      // Check cache first using normalized URL
+      const cachedContent = pdfCache.get(normalizedUrl);
+      if (cachedContent) {
+        return cachedContent;
+      }
+
+      console.log("Downloading PDF from:", normalizedUrl);
 
       // Download the PDF with conservative limits
-      const response = await axios.get(url, {
+      const response = await axios.get(normalizedUrl, {
         responseType: "arraybuffer",
         headers: {
           "User-Agent":
@@ -174,6 +190,15 @@ export class SummaryService {
         .replace(/\s+/g, " ") // Replace multiple whitespace with single space
         .trim()
         .substring(0, 4000); // Reduced to 4000 characters for better performance
+
+      // Cache the processed content using normalized URL
+      pdfCache.set(
+        normalizedUrl,
+        cleanedText,
+        response.data.byteLength,
+        data.numpages,
+        data.info?.Title
+      );
 
       return cleanedText;
     } catch (error) {

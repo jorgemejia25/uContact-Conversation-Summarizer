@@ -147,8 +147,8 @@ Content-Type: {{contentType}}
 
 {
   "number": "50231573100",
-  "message": "¿Puedes resumir este documento PDF y explicarme los puntos principales?",
-  "pdfUrl": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+  "message": "Que productos tienes. Cuales son las principales diferencias y mencioname un producto al azar.",
+  "pdfUrl": "https://www.aliaxis.es/pim/fip-new/downloads/es/PVDF/Documentos%20técnicos/CATÁLOGO%20COMPLETO%20ACCESORIOS%20PVC-U.pdf",
   "language": "es"
 }
 
@@ -202,5 +202,57 @@ Content-Type: {{contentType}}
 
 {
   "message": "Resume este PDF: https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+  "language": "es"
+}
+
+### PDF Cache Management Endpoints
+
+### Get PDF Cache Statistics
+GET {{host}}/api/summarize/cache/stats
+
+### List Cached PDF URLs
+GET {{host}}/api/summarize/cache/list
+
+### Clear PDF Cache
+DELETE {{host}}/api/summarize/cache/clear
+
+### Remove specific URL from cache
+DELETE {{host}}/api/summarize/cache/remove
+Content-Type: {{contentType}}
+
+{
+  "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+}
+
+### Local endpoints for cache management
+
+### Get PDF Cache Statistics (Local)
+GET http://localhost:8000/api/summarize/cache/stats
+
+### List Cached PDF URLs (Local)
+GET http://localhost:8000/api/summarize/cache/list
+
+### Clear PDF Cache (Local)
+DELETE http://localhost:8000/api/summarize/cache/clear
+
+### Agent Chat - URL with special characters (now works!)
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Analiza este catálogo con caracteres especiales en la URL",
+  "pdfUrl": "https://www.aliaxis.es/pim/fip-new/downloads/es/PVDF/Documentos técnicos/CATÁLOGO COMPLETO ACCESORIOS PVC-U.pdf",
+  "language": "es"
+}
+
+### Test URL normalization with special characters (Local)
+POST http://localhost:8000/api/agent/chat
+Content-Type: application/json
+
+{
+  "number": "50231573100",
+  "message": "Prueba de URL con espacios y caracteres especiales",
+  "pdfUrl": "https://example.com/documentos/catálogo de productos.pdf",
   "language": "es"
 }
