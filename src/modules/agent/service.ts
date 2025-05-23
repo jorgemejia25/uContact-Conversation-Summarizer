@@ -80,11 +80,33 @@ export class AgentService {
 
       for (const dateRecord of recentDates) {
         try {
+          // Format the date properly for SQL query
+          let formattedDate = dateRecord.fecha;
+
+          // Convert fecha to proper SQL date format (YYYY-MM-DD)
+          if (typeof dateRecord.fecha === "string") {
+            // If it's a full date string with timezone info, parse and format it
+            if (
+              dateRecord.fecha.includes("GMT") ||
+              dateRecord.fecha.includes("T") ||
+              dateRecord.fecha.length > 10
+            ) {
+              const date = new Date(dateRecord.fecha);
+              if (!isNaN(date.getTime())) {
+                formattedDate = date.toISOString().split("T")[0];
+              }
+            }
+          }
+
+          console.log(
+            `Processing date: ${dateRecord.fecha} -> ${formattedDate}`
+          );
+
           const summary = await this.databaseService.getChatSummary(
             phoneNumber,
-            dateRecord.fecha
+            formattedDate
           );
-          conversationHistory += `Fecha ${dateRecord.fecha}: ${summary}\n`;
+          conversationHistory += `Fecha ${formattedDate}: ${summary}\n`;
         } catch (error) {
           console.error(
             `Error getting chat summary for ${dateRecord.fecha}:`,

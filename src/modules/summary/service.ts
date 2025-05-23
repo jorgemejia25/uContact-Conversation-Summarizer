@@ -100,20 +100,21 @@ export class SummaryService {
    */
   private async scrapeContent(url: string): Promise<string> {
     try {
-      // Primer intento con Puppeteer (navegador headless)
-      try {
-        console.log("Intentando scraping con Puppeteer:", url);
-        const content = await this.scrapeWithPuppeteer(url);
-        if (content && content.trim().length > 100) {
-          console.log("Contenido extraído con Puppeteer exitoso");
-          return content;
-        }
-      } catch (puppeteerError) {
-        console.error("Error en scraping con Puppeteer:", puppeteerError);
-        // Si Puppeteer falla, continuamos con el método tradicional
-      }
+      // Temporally disabled Puppeteer due to Chrome not being available
+      // First attempt with Puppeteer (headless browser)
+      // try {
+      //   console.log("Intentando scraping con Puppeteer:", url);
+      //   const content = await this.scrapeWithPuppeteer(url);
+      //   if (content && content.trim().length > 100) {
+      //     console.log("Contenido extraído con Puppeteer exitoso");
+      //     return content;
+      //   }
+      // } catch (puppeteerError) {
+      //   console.error("Error en scraping con Puppeteer:", puppeteerError);
+      //   // Si Puppeteer falla, continuamos con el método tradicional
+      // }
 
-      // Segundo intento con Axios y Cheerio si Puppeteer falla
+      // Using Axios and Cheerio for scraping
       console.log("Intentando scraping con Axios/Cheerio:", url);
       const response = await axios.get(url, {
         headers: {

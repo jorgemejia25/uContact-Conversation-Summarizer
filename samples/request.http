@@ -126,7 +126,7 @@ Content-Type: {{contentType}}
 
 {
   "number": "50231573100",
-  "message": "Can you help me understand this topic better?",
+  "message": "Continue",
   "contextUrl": "https://en.wikipedia.org/wiki/Artificial_intelligence",
   "language": "en"
 }
