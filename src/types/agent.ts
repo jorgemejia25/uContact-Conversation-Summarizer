@@ -7,6 +7,7 @@ export interface AgentRequest {
   number: string;
   message: string;
   contextUrl?: string;
+  pdfUrl?: string;
   language?: string; // 'es' (Spanish), 'en' (English), or 'pt' (Portuguese)
 }
 
@@ -27,7 +28,14 @@ export const AgentRequestSchema = Type.Object({
   contextUrl: Type.Optional(
     Type.String({
       format: "uri",
-      description: "Optional URL to provide context for the response",
+      description:
+        "Optional URL to provide context for the response (web pages)",
+    })
+  ),
+  pdfUrl: Type.Optional(
+    Type.String({
+      format: "uri",
+      description: "Optional PDF URL to provide context for the response",
     })
   ),
   language: Type.Optional(
@@ -40,4 +48,4 @@ export const AgentRequestSchema = Type.Object({
       }
     )
   ),
-}); 
+});

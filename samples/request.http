@@ -148,7 +148,7 @@ Content-Type: {{contentType}}
 {
   "number": "50231573100",
   "message": "¿Puedes resumir este documento PDF y explicarme los puntos principales?",
-  "contextUrl": "https://example.com/document.pdf",
+  "pdfUrl": "https://example.com/document.pdf",
   "language": "es"
 }
 
@@ -159,7 +159,7 @@ Content-Type: {{contentType}}
 {
   "number": "50231573100",
   "message": "Please analyze this PDF document and tell me the key points",
-  "contextUrl": "https://arxiv.org/pdf/2301.00234.pdf",
+  "pdfUrl": "https://arxiv.org/pdf/2301.00234.pdf",
   "language": "en"
 }
 
@@ -170,7 +170,18 @@ Content-Type: application/json
 {
   "number": "50231573100",
   "message": "Analiza este documento PDF y dime qué contiene",
-  "contextUrl": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+  "pdfUrl": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+  "language": "es"
+}
+
+### Agent Chat - PDF with working URL
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Analiza este documento PDF de muestra",
+  "pdfUrl": "https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf",
   "language": "es"
 }
 

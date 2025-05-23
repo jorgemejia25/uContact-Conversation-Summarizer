@@ -123,7 +123,7 @@ export class SummaryService {
    * @param url The PDF URL to process.
    * @returns A promise that resolves to the extracted text.
    */
-  private async processPdfFromUrl(url: string): Promise<string> {
+  public async processPdfFromUrl(url: string): Promise<string> {
     try {
       console.log("Downloading PDF from:", url);
 

@@ -57,8 +57,8 @@ Chat inteligente que utiliza historial conversacional del usuario y contexto opc
 
 #### Características del Agente:
 - 🧠 Acceso al historial de conversaciones previas del usuario
-- 🔗 Capacidad de usar URLs como contexto adicional
-- 📄 **Nuevo: Soporte para documentos PDF como contexto**
+- 🔗 Capacidad de usar URLs como contexto adicional (`contextUrl`)
+- 📄 **Soporte dedicado para documentos PDF** (`pdfUrl`)
 - 🌍 Soporte multiidioma
 - 📱 Identificación por número de teléfono
 - 🤖 Respuestas personalizadas basadas en IA
@@ -69,6 +69,16 @@ Chat inteligente que utiliza historial conversacional del usuario y contexto opc
   "number": "50231573100",
   "message": "¿Puedes ayudarme con información sobre este tema?",
   "contextUrl": "https://example.com/context",
+  "language": "es"
+}
+```
+
+**Para documentos PDF, usa `pdfUrl`:**
+```json
+{
+  "number": "50231573100",
+  "message": "¿Puedes analizar este documento?",
+  "pdfUrl": "https://example.com/document.pdf",
   "language": "es"
 }
 ```
@@ -99,7 +109,7 @@ Chat inteligente que utiliza historial conversacional del usuario y contexto opc
 {
   "number": "50231573100",
   "message": "Analiza este documento y explícame los puntos clave",
-  "contextUrl": "https://example.com/report.pdf",
+  "pdfUrl": "https://example.com/report.pdf",
   "language": "es"
 }
 ```

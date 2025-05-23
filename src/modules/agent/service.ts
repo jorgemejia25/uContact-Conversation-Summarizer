@@ -28,11 +28,25 @@ export class AgentService {
         request.number
       );
 
-      // Get context from URL if provided
+      // Get context from URL or PDF if provided
       let contextContent = "";
-      if (request.contextUrl) {
+
+      // Handle PDF URL if provided
+      if (request.pdfUrl) {
+        try {
+          contextContent = await this.getPdfContext(request.pdfUrl);
+          console.log("PDF context successfully extracted");
+        } catch (error) {
+          console.error("Error getting PDF context:", error);
+          // Continue without PDF context if it fails
+        }
+      }
+
+      // Handle regular web URL if provided (and no PDF was processed)
+      if (request.contextUrl && !contextContent) {
         try {
           contextContent = await this.getUrlContext(request.contextUrl);
+          console.log("Web context successfully extracted");
         } catch (error) {
           console.error("Error getting URL context:", error);
           // Continue without context if URL fails
@@ -147,11 +161,27 @@ export class AgentService {
    */
   private async getUrlContext(url: string): Promise<string> {
     try {
-      // Use the summary service's scraping functionality
+      // Use the summary service's scraping functionality for web pages
       const content = await this.summaryService.getScrapeContent(url);
       return content.substring(0, 2000); // Limit context length
     } catch (error) {
       console.error("Error scraping URL context:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Gets context content from a PDF URL.
+   * @param pdfUrl The PDF URL to process.
+   * @returns A string containing the PDF context content.
+   */
+  private async getPdfContext(pdfUrl: string): Promise<string> {
+    try {
+      // Use the summary service's PDF processing functionality
+      const content = await this.summaryService.processPdfFromUrl(pdfUrl);
+      return content.substring(0, 3000); // Allow more content for PDFs
+    } catch (error) {
+      console.error("Error processing PDF context:", error);
       throw error;
     }
   }
