@@ -8,6 +8,9 @@ import axios from "axios";
 import { injectable } from "tsyringe";
 import puppeteer from "puppeteer";
 
+// Import pdf-parse correctly
+const pdfParse = require("pdf-parse");
+
 /**
  * Service for generating summaries from web page content.
  */
@@ -90,7 +93,106 @@ export class SummaryService {
    * @returns A promise that resolves to the scraped content.
    */
   public async getScrapeContent(url: string): Promise<string> {
+    // Check if the URL is a PDF
+    if (this.isPdfUrl(url)) {
+      console.log("Detected PDF URL, processing as PDF:", url);
+      return this.processPdfFromUrl(url);
+    }
+
     return this.scrapeContent(url);
+  }
+
+  /**
+   * Checks if a URL points to a PDF file.
+   * @param url The URL to check.
+   * @returns True if the URL appears to be a PDF.
+   */
+  private isPdfUrl(url: string): boolean {
+    const urlLower = url.toLowerCase();
+    // Check if URL ends with .pdf or contains pdf in query parameters
+    return (
+      urlLower.endsWith(".pdf") ||
+      urlLower.includes(".pdf?") ||
+      urlLower.includes("pdf=") ||
+      urlLower.includes("filetype=pdf")
+    );
+  }
+
+  /**
+   * Downloads and extracts text from a PDF URL.
+   * @param url The PDF URL to process.
+   * @returns A promise that resolves to the extracted text.
+   */
+  private async processPdfFromUrl(url: string): Promise<string> {
+    try {
+      console.log("Downloading PDF from:", url);
+
+      // Download the PDF
+      const response = await axios.get(url, {
+        responseType: "arraybuffer",
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+          Accept: "application/pdf,*/*",
+        },
+        timeout: 30000, // 30 seconds timeout for PDF downloads
+        maxContentLength: 50 * 1024 * 1024, // 50MB max file size
+      });
+
+      // Verify content type
+      const contentType = response.headers["content-type"];
+      if (contentType && !contentType.includes("pdf")) {
+        console.warn(
+          `Warning: Expected PDF but got content-type: ${contentType}`
+        );
+      }
+
+      console.log(`PDF downloaded, size: ${response.data.byteLength} bytes`);
+
+      // Extract text from PDF
+      const data = await pdfParse(response.data);
+
+      if (!data.text || data.text.trim().length === 0) {
+        throw new Error("No text could be extracted from the PDF");
+      }
+
+      console.log(
+        `Text extracted from PDF, length: ${data.text.length} characters`
+      );
+      console.log(
+        `PDF info - Pages: ${data.numpages}, Title: ${
+          data.info?.Title || "N/A"
+        }`
+      );
+
+      // Clean and limit the text
+      const cleanedText = data.text
+        .replace(/\s+/g, " ") // Replace multiple whitespace with single space
+        .trim()
+        .substring(0, 5000); // Limit to 5000 characters for PDFs (more than web pages)
+
+      return cleanedText;
+    } catch (error) {
+      console.error("Error processing PDF:", error);
+
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          throw new Error(
+            "PDF download timeout - file too large or server too slow"
+          );
+        } else if (error.response?.status === 404) {
+          throw new Error("PDF file not found (404)");
+        } else if (error.response?.status === 403) {
+          throw new Error("Access denied to PDF file (403)");
+        }
+      }
+
+      throw new Error(
+        `Failed to process PDF: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
+    }
   }
 
   /**

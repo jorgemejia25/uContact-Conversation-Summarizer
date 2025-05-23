@@ -105,7 +105,7 @@ Content-Type: {{contentType}}
 
 {
   "number": "50231573100",
-  "message": "Revisa mis conversaciones anteriores. Qué te dije?",
+  "message": "Bien gracias. ",
   "language": "es"
 }
 
@@ -115,7 +115,7 @@ Content-Type: {{contentType}}
 
 {
   "number": "50231573100",
-  "message": "Por favor",
+  "message": "¿Qué producto me recomiendas? busco una computadora 100% funcional que no exceda los 500$.",
   "contextUrl": "https://www.mytec.com.gt/",
   "language": "es"
 }
@@ -138,5 +138,47 @@ Content-Type: application/json
 {
   "number": "50231573100",
   "message": "¿Qué puedes decirme sobre mi historial de llamadas?",
+  "language": "es"
+}
+
+### Agent Chat - PDF context (Spanish)
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "¿Puedes resumir este documento PDF y explicarme los puntos principales?",
+  "contextUrl": "https://example.com/document.pdf",
+  "language": "es"
+}
+
+### Agent Chat - PDF context (English)
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Please analyze this PDF document and tell me the key points",
+  "contextUrl": "https://arxiv.org/pdf/2301.00234.pdf",
+  "language": "en"
+}
+
+### Agent Chat - Local PDF test
+POST http://localhost:8000/api/agent/chat
+Content-Type: application/json
+
+{
+  "number": "50231573100",
+  "message": "Analiza este documento PDF y dime qué contiene",
+  "contextUrl": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+  "language": "es"
+}
+
+### Test PDF Summarization directly
+POST {{host}}/api/summarize
+Content-Type: {{contentType}}
+
+{
+  "message": "Resume este PDF: https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
   "language": "es"
 }
