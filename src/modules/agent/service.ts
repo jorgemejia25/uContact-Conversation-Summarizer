@@ -1,3 +1,5 @@
+import * as path from "path";
+
 import { AgentRequest } from "../../types/agent";
 import { DatabaseService } from "../database/service";
 import { SummaryService } from "../summary/service";
@@ -51,7 +53,38 @@ export class AgentService {
         }
       }
 
-      // Handle regular web URL if provided (and no PDF was processed)
+      // Handle Excel URL if provided (and no PDF context yet)
+      if (request.excelUrl && !contextContent) {
+        try {
+          contextContent = await this.getExcelContext(request.excelUrl);
+          console.log("Excel context successfully extracted");
+        } catch (error) {
+          console.error("Error getting Excel context:", error);
+          // Add a note about Excel processing failure
+          const excelErrorMessages = {
+            es: "Nota: No se pudo procesar el archivo Excel proporcionado debido a un error técnico (archivo muy grande, timeout o formato no compatible). Responderé basándome en tu historial de conversaciones.",
+            en: "Note: Could not process the provided Excel file due to a technical error (file too large, timeout, or incompatible format). I'll respond based on your conversation history.",
+            pt: "Nota: Não foi possível processar o arquivo Excel fornecido devido a um erro técnico (arquivo muito grande, timeout ou formato incompatível). Responderei com base no seu histórico de conversas.",
+          };
+
+          const language = request.language || "es";
+          contextContent =
+            excelErrorMessages[language as keyof typeof excelErrorMessages];
+        }
+      }
+
+      // Si no se proporcionó excelUrl y aún no tenemos contexto, usa el Excel de muestra
+      if (!request.excelUrl && !contextContent) {
+        try {
+          const defaultExcelPath = path.join("files", "sample.xlsx");
+          contextContent = await this.getExcelContext(defaultExcelPath);
+          console.log("Default Excel context extracted");
+        } catch (error) {
+          console.error("Error getting default Excel context:", error);
+        }
+      }
+
+      // Handle regular web URL if provided (and no PDF or Excel was processed)
       if (request.contextUrl && !contextContent) {
         try {
           contextContent = await this.getUrlContext(request.contextUrl);
@@ -191,6 +224,26 @@ export class AgentService {
       return content.substring(0, 3000); // Allow more content for PDFs
     } catch (error) {
       console.error("Error processing PDF context:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Gets context content from a Excel URL.
+   * @param excelPathOrUrl The Excel URL or path to process.
+   * @returns A string containing the Excel context content.
+   */
+  private async getExcelContext(excelPathOrUrl: string): Promise<string> {
+    try {
+      const isRemote =
+        excelPathOrUrl.startsWith("http://") ||
+        excelPathOrUrl.startsWith("https://");
+      const content = isRemote
+        ? await this.summaryService.processExcelFromUrl(excelPathOrUrl)
+        : await this.summaryService.processExcelFromFile(excelPathOrUrl);
+      return content.substring(0, 3000);
+    } catch (error) {
+      console.error("Error processing Excel context:", error);
       throw error;
     }
   }

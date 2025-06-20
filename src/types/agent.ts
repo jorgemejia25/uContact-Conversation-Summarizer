@@ -8,6 +8,7 @@ export interface AgentRequest {
   message: string;
   contextUrl?: string;
   pdfUrl?: string;
+  excelUrl?: string;
   language?: string; // 'es' (Spanish), 'en' (English), or 'pt' (Portuguese)
 }
 
@@ -36,6 +37,12 @@ export const AgentRequestSchema = Type.Object({
     Type.String({
       minLength: 1,
       description: "Optional PDF URL to provide context for the response",
+    })
+  ),
+  excelUrl: Type.Optional(
+    Type.String({
+      minLength: 1,
+      description: "Optional Excel file URL (.xlsx or .xls) to provide context for the response",
     })
   ),
   language: Type.Optional(

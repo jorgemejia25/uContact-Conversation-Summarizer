@@ -1,4 +1,4 @@
-@host =  https://oradepoc.ucontactcloud.com/api/
+@host =  http://localhost:8000
 @contentType = application/json
 
 
@@ -251,5 +251,26 @@ Content-Type: application/json
   "number": "50231573100",
   "message": "Prueba de URL con espacios y caracteres especiales",
   "pdfUrl": "https://example.com/documentos/catálogo de productos.pdf",
+  "language": "es"
+}
+
+### Agent Chat - Excel context (Spanish)
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Analiza este Excel y dame las principales métricas",
+  "excelUrl": "https://example.com/report.xlsx",
+  "language": "es"
+}
+
+### Agent Chat - Default Excel (usa files/sample.xlsx)
+POST {{host}}/api/agent/chat
+Content-Type: {{contentType}}
+
+{
+  "number": "50231573100",
+  "message": "Cual es la deuda de Roberto Pop Ical",
   "language": "es"
 }

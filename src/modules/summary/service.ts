@@ -1,5 +1,9 @@
+import * as XLSX from "xlsx";
 import * as cheerio from "cheerio";
 import * as fs from "fs";
+import * as path from "path";
+
+import { isValidUrl, normalizeUrl } from "../../utils/url-encoder";
 
 import FormData from "form-data";
 import { SummaryRequest } from "../../types/summary";
@@ -8,7 +12,6 @@ import axios from "axios";
 import { injectable } from "tsyringe";
 import { pdfCache } from "../../utils/pdf-cache";
 import puppeteer from "puppeteer";
-import { normalizeUrl, isValidUrl } from "../../utils/url-encoder";
 
 // Import pdf-parse correctly
 const pdfParse = require("pdf-parse");
@@ -101,6 +104,12 @@ export class SummaryService {
       return this.processPdfFromUrl(url);
     }
 
+    // Check if the URL is an Excel file
+    if (this.isExcelUrl(url)) {
+      console.log("Detected Excel URL, processing as Excel:", url);
+      return this.processExcelFromUrl(url);
+    }
+
     return this.scrapeContent(url);
   }
 
@@ -117,6 +126,21 @@ export class SummaryService {
       urlLower.includes(".pdf?") ||
       urlLower.includes("pdf=") ||
       urlLower.includes("filetype=pdf")
+    );
+  }
+
+  /**
+   * Checks if a URL points to an Excel file (.xlsx or .xls).
+   * @param url The URL to check.
+   * @returns True if the URL appears to be an Excel file.
+   */
+  private isExcelUrl(url: string): boolean {
+    const urlLower = url.toLowerCase();
+    return (
+      urlLower.endsWith(".xlsx") ||
+      urlLower.endsWith(".xls") ||
+      urlLower.includes(".xlsx?") ||
+      urlLower.includes(".xls?")
     );
   }
 
@@ -224,6 +248,101 @@ export class SummaryService {
         }`
       );
     }
+  }
+
+  /**
+   * Downloads and extracts text from an Excel file URL.
+   * @param url The Excel URL to process.
+   * @returns A promise that resolves to the extracted text.
+   */
+  public async processExcelFromUrl(url: string): Promise<string> {
+    try {
+      const normalizedUrl = normalizeUrl(url);
+      if (!isValidUrl(normalizedUrl)) {
+        throw new Error("Invalid URL format");
+      }
+      // Check cache first (reuse pdfCache for simplicity)
+      const cachedContent = pdfCache.get(normalizedUrl);
+      if (cachedContent) {
+        return cachedContent;
+      }
+      console.log("Downloading Excel from:", normalizedUrl);
+      const response = await axios.get(normalizedUrl, {
+        responseType: "arraybuffer",
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+          Accept:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, */*",
+        },
+        timeout: 15000,
+        maxContentLength: 10 * 1024 * 1024, // 10MB
+        maxRedirects: 3,
+      });
+
+      const contentType = response.headers["content-type"];
+      if (
+        contentType &&
+        !contentType.includes("sheet") &&
+        !contentType.includes("excel")
+      ) {
+        console.warn(
+          `Warning: Expected Excel but got content-type: ${contentType}`
+        );
+      }
+
+      const workbook = XLSX.read(response.data, { type: "buffer" });
+      let text = "";
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as Array<
+          Array<any>
+        >;
+        text += this.convertRowsToStructuredText(rows, sheetName) + "\n";
+      });
+
+      if (!text.trim()) {
+        throw new Error("No text could be extracted from the Excel file");
+      }
+
+      const cleanedText = text.replace(/\s+/g, " ").trim().substring(0, 4000);
+
+      // Cache with pages = 0
+      pdfCache.set(
+        normalizedUrl,
+        cleanedText,
+        response.data.byteLength,
+        0,
+        workbook.Props?.Title as string | undefined
+      );
+
+      return cleanedText;
+    } catch (error) {
+      console.error("Error processing Excel:", error);
+      throw new Error(
+        `Failed to process Excel: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
+    }
+  }
+
+  private convertRowsToStructuredText(
+    rows: Array<Array<any>>,
+    sheetName: string
+  ): string {
+    if (!rows || rows.length === 0) return "";
+    const headers = rows[0].map((h, idx) =>
+      h ? String(h).trim() : `col${idx}`
+    );
+    let result = `### Hoja: ${sheetName}\n`;
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length === 0) continue;
+      const pairs = headers.map((h, idx) => `${h}: ${row[idx] ?? ""}`);
+      result += pairs.join(", ") + "\n";
+    }
+    return result;
   }
 
   /**
@@ -592,6 +711,57 @@ ${text}`,
       return `Error processing audio file: ${
         error instanceof Error ? error.message : String(error)
       }`;
+    }
+  }
+
+  /**
+   * Extracts text from a local Excel file path.
+   * @param filePath Absolute or relative path to the Excel file
+   */
+  public async processExcelFromFile(filePath: string): Promise<string> {
+    try {
+      const resolvedPath = path.isAbsolute(filePath)
+        ? filePath
+        : path.resolve(process.cwd(), filePath);
+
+      if (!fs.existsSync(resolvedPath)) {
+        throw new Error(`Excel file not found at ${resolvedPath}`);
+      }
+
+      const data = fs.readFileSync(resolvedPath);
+      const workbook = XLSX.read(data, { type: "buffer" });
+      let text = "";
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as Array<
+          Array<any>
+        >;
+        text += this.convertRowsToStructuredText(rows, sheetName) + "\n";
+      });
+
+      if (!text.trim()) {
+        throw new Error("No text could be extracted from the Excel file");
+      }
+
+      const cleanedText = text.replace(/\s+/g, " ").trim().substring(0, 4000);
+
+      // Cache content keyed by absolute path
+      pdfCache.set(
+        resolvedPath,
+        cleanedText,
+        data.byteLength,
+        0,
+        workbook.Props?.Title as string | undefined
+      );
+
+      return cleanedText;
+    } catch (error) {
+      console.error("Error processing local Excel:", error);
+      throw new Error(
+        `Failed to process local Excel: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
     }
   }
 }
