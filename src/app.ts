@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import fastify, { FastifyInstance } from "fastify";
 
 import { AgentController } from "./modules/agent/controller";

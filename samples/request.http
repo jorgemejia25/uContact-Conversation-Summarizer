@@ -1,4 +1,4 @@
-@host =  http://localhost:8000
+@host =  https://oradepoc.ucontactcloud.com/api/
 @contentType = application/json
 
 
